@@ -19,7 +19,7 @@ from src.models.evaluate import evaluate
 from src.utils.save_artifacts import save_artifacts
 from src.utils.logger import get_logger
 from sklearn.model_selection import train_test_split
-from src.models.pipeline import build_and_train_pipeline
+from src.models.pipeline import build_and_train_pipeline, build_and_train_ridge, build_and_train_lasso
 
 logger = get_logger(__name__)
 
@@ -63,6 +63,17 @@ def run_training_pipeline():
     # step 5 - evaluate
 
     metrics = evaluate(pipeline, X_test, y_test)
+
+    # Ridge
+    ridge_pipeline = build_and_train_ridge(X_train, y_train)
+    ridge_metrics = evaluate(ridge_pipeline, X_test, y_test)
+    logger.info(f"Ridge — MAE: {ridge_metrics['mean_absolute_error']:.2f}, R2: {ridge_metrics['r2_score']:.4f}")
+
+    # Lasso 
+    lasso_pipeline = build_and_train_lasso(X_train, y_train)
+    lasso_metrics = evaluate(lasso_pipeline, X_test, y_test)
+
+    logger.info(f"Lasso - MAE: {lasso_metrics['mean_absolute_error']:.2f}, R2: {lasso_metrics['r2_score']:.4f}")
 
     # step 6 - save artifacts
 

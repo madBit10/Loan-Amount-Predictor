@@ -6,6 +6,52 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+# remove outliers function using IQR
+
+def remove_outliers(df: pd.DataFrame, columns: list) -> pd.DataFrame:
+
+    # rows before removing the outliers
+
+    rows_before = len(df)
+
+    for column in columns:
+        # calculate the first quartile
+        Q1 = df[column].quantile(0.25)
+
+        # calculate the 3rd quartile
+        Q3 = df[column].quantile(0.75)
+
+        # IQR
+        IQR = Q3 - Q1
+
+        # lower fence
+        lower_fence = Q1 - 1.5 * IQR
+        
+        # upper fence 
+        upper_fence = Q3 + 1.5 * IQR
+
+        
+
+        # masking to remove the rows that are not within the range of the fence
+
+        mask = (df[column] >= lower_fence) & (df[column] <= upper_fence)
+        df = df[mask]
+
+    # rows after removing the outliers
+    
+    rows_after = len(df)
+
+    rows_removed = rows_before - rows_after
+
+
+    logger.info(f"Number of rows that were removed: {rows_removed}")
+
+    return df
+
+
+
+
+
 def preprocess(df: pd.DataFrame, target_column: str):
     """
     Cleans and preprocess raw data for training
@@ -39,6 +85,11 @@ def preprocess(df: pd.DataFrame, target_column: str):
     df["person_emp_length"] = df["person_emp_length"].fillna(df["person_emp_length"].median())
 
     logger.info("Missing values filled")
+
+    # step - outlier detection and removal
+
+    outlier_cols = ["person_age", "person_income", "person_emp_length", "loan_amnt", "loan_int_rate"]
+    df = remove_outliers(df, outlier_cols)
 
 
     # step 3 - Convert Y/N to 1/0

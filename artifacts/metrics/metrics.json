@@ -1,6 +1,6 @@
 {
-    "mean_absolute_error": 1506.1711654941173,
-    "mean_squared_error": 4673890.025214778,
-    "root_mean_squared_error": 2161.9181356413055,
-    "r2_score": 0.8025330122066411
+    "mean_absolute_error": 1491.47637044443,
+    "mean_squared_error": 4534558.268709248,
+    "root_mean_squared_error": 2129.4502268682513,
+    "r2_score": 0.8084196338671155
 }

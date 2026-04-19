@@ -3,6 +3,7 @@
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from src.utils.logger import get_logger
+import numpy as np
 
 logger = get_logger(__name__)
 
@@ -49,7 +50,25 @@ def remove_outliers(df: pd.DataFrame, columns: list) -> pd.DataFrame:
     return df
 
 
+def create_features(df):
+    # feature engineering
 
+    df['loan_to_income_ratio'] = df['loan_amnt']/ (df['person_income'] + 1) # the feature gives the ratio of the loan amount/ person income
+
+    # income_per_year_emp = df['person_income']/df['person_emp_length'] # the feature gives the ratio between the person income and the emp length of a person
+
+    # df['income_per_year_emp'] = np.where(
+    #     df['person_emp_length'] > 0,
+    #     df['person_income'] / df['person_emp_length'],df['person_income']
+    # )
+
+
+    df['income_per_year_emp'] = df['person_income']/ (df['person_emp_length'] + 1)
+
+    # logger.info(f"Inf values: {np.isinf(df.select_dtypes(include=np.number)).sum().sum()}")                                                                                            
+    # logger.info(f"NaN values: {df.isnull().sum().sum()}")
+
+    return df
 
 
 def preprocess(df: pd.DataFrame, target_column: str):
@@ -90,6 +109,15 @@ def preprocess(df: pd.DataFrame, target_column: str):
 
     outlier_cols = ["person_age", "person_income", "person_emp_length", "loan_amnt", "loan_int_rate"]
     df = remove_outliers(df, outlier_cols)
+
+    logger.info("Detected the outliers and removed them")
+
+    
+    # step - create features
+
+    df = create_features(df)
+
+    logger.info("Applied feature engineering and created the necessary features")
 
 
     # step 3 - Convert Y/N to 1/0

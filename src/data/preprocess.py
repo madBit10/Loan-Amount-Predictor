@@ -53,7 +53,8 @@ def remove_outliers(df: pd.DataFrame, columns: list) -> pd.DataFrame:
 def create_features(df):
     # feature engineering
 
-    df['loan_to_income_ratio'] = df['loan_amnt']/ (df['person_income'] + 1) # the feature gives the ratio of the loan amount/ person income
+    # removed the loan_to_income_ratio as it would use the loan_amnt to get created and the user does not know the loan_amnt at the time of the prediction 
+    # df['loan_to_income_ratio'] = df['loan_amnt']/ (df['person_income'] + 1) # the feature gives the ratio of the loan amount/ person income
 
     # income_per_year_emp = df['person_income']/df['person_emp_length'] # the feature gives the ratio between the person income and the emp length of a person
 

@@ -9,6 +9,7 @@
 
 import argparse
 from src.pipeline.training_pipeline import run_training_pipeline
+from src.pipeline.prediction_pipeline import run_prediction_pipeline
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -29,13 +30,25 @@ def main():
         help="Run the training pipeline"
     )
 
+    parser.add_argument(
+        "--predict",
+        type=str,
+        help="Run prediction on input CSV file. Provide path to CSV"
+    )
+
     args = parser.parse_args()
 
     if args.train:
         logger.info("Training mode selected")
         run_training_pipeline()
+    elif args.predict:
+        logger.info("Prediction mode selected")
+        run_prediction_pipeline(args.predict)
     else:
         logger.info("No mode provided. Use --train to train the model")
+        print("Usage: ")
+        print("Train: python3 -m src.main --train")
+        print("Predict: python3 -m src.main --predict data/sample_input.csv")
 
 
 if __name__ == "__main__":

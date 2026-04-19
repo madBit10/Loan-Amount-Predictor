@@ -1,22 +1,25 @@
 # Loan Amount Prediction
 
-A regression ML project that predicts how much loan a person will borrow, using Linear Regression with an Sklearn Pipeline.
+A regression ML project that predicts how much loan a person will borrow, using Linear Regression, Ridge, and Lasso with Sklearn Pipelines.
 
 ## Project Structure
 
 ```
 loan_amount_prediction/
-├── data/                  # Dataset and exploration notebook
+├── data/
+│   ├── credit_risk_dataset.csv   # Training dataset
+│   └── sample_input.csv          # Sample input for prediction
 ├── src/
-│   ├── main.py            # CLI entry point
-│   ├── config/            # Configuration management
-│   ├── data/              # Data loading and preprocessing
-│   ├── models/            # Training, pipeline, and evaluation
-│   ├── pipeline/          # Training and prediction pipelines
-│   └── utils/             # Logger and artifact saving
+│   ├── main.py                   # CLI entry point (--train / --predict)
+│   ├── config/                   # Configuration management
+│   ├── data/                     # Data loading and preprocessing
+│   ├── models/                   # Training, pipeline, and evaluation
+│   ├── pipeline/                 # Training and prediction pipelines
+│   └── utils/                    # Logger and artifact saving
 ├── artifacts/
-│   └── metrics/           # Model performance metrics
-├── tests/                 # Unit tests
+│   ├── models/                   # Saved model and feature columns
+│   └── metrics/                  # Model performance metrics
+├── tests/                        # Unit tests
 ├── requirements.txt
 └── run_training.sh
 ```
@@ -27,12 +30,13 @@ loan_amount_prediction/
 - 32,581 rows, 12 columns
 - Target: `loan_amnt` (continuous — loan amount in dollars)
 
-## Model
+## Models
 
-- Algorithm: Linear Regression (Sklearn Pipeline with StandardScaler)
-- MAE: $2,846
-- RMSE: $4,041
-- R²: 0.598
+Three regression models compared, all using Sklearn Pipeline with StandardScaler:
+
+- Linear Regression
+- Ridge Regression (alpha=10)
+- Lasso Regression (alpha=10)
 
 ## Setup
 
@@ -63,6 +67,11 @@ Place `credit_risk_dataset.csv` in the `data/` folder.
 python3 -m src.main --train
 ```
 
+### Predict loan amount
+```bash
+python3 -m src.main --predict data/sample_input.csv
+```
+
 ### Run tests then train
 ```bash
 bash run_training.sh
@@ -70,15 +79,16 @@ bash run_training.sh
 
 ## Results
 
-| Metric | Value |
-|---|---|
-| MAE | $2,846 |
-| RMSE | $4,041 |
-| R² | 0.598 |
+| Metric | Linear Regression | Ridge | Lasso |
+|---|---|---|---|
+| MAE | $1,507 | $1,507 | $1,503 |
+| RMSE | $2,161 | $2,161 | $2,161 |
+| R² | 0.8026 | 0.8026 | 0.8026 |
 
 ## Key Design Decisions
 
-- **Sklearn Pipeline** — bundles StandardScaler + LinearRegression into one object, prevents data leakage
+- **Sklearn Pipeline** — bundles StandardScaler + model into one object, prevents data leakage
 - **Median imputation** — robust to outliers in financial data
-- **loan_status kept as feature** — default history is a strong signal for loan amount
+- **IQR outlier removal** — removed 4,825 rows (14.9%) with extreme values in age, income, employment length, loan amount, and interest rate. R² improved from 0.598 to 0.8026
+- **Feature engineering** — created `income_per_year_emp` (person_income / (person_emp_length + 1)) to capture income stability. `loan_to_income_ratio` was initially created but removed because it uses the target variable (`loan_amnt`), which is unavailable at prediction time
 - **Feature columns saved** — ensures prediction uses the same feature set as training
